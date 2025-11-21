@@ -50,5 +50,6 @@ pub fn main() !void {
     var writer = std.fs.File.writer(file, buf[0..]);
     try writer.interface.print("P6\n{d} {d}\n{d}\n", .{ width, height, 255 });
     try writer.interface.writeAll(ctx.pixels);
+    try writer.interface.flush();
     std.debug.print("File saved to output.ppm.\n", .{});
 }
