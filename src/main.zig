@@ -11,9 +11,10 @@ pub fn main() !void {
 
     if (args.len < 3) return error.NotEnoughArgs;
 
-    const width = try std.fmt.parseInt(u32, args[1], 10);
-    const height = try std.fmt.parseInt(u32, args[2], 10);
+    const width = try std.fmt.parseInt(u64, args[1], 10);
+    const height = try std.fmt.parseInt(u64, args[2], 10);
     const pixels = try gpa.alloc(u8, width * height * 3);
+    defer gpa.free(pixels);
 
     const ctx = context.Context{
         .width = width,
