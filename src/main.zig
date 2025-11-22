@@ -13,7 +13,10 @@ pub fn main() !void {
 
     const width = try std.fmt.parseInt(u32, args[1], 10);
     const height = try std.fmt.parseInt(u32, args[2], 10);
-    const pixels = try gpa.alloc(u8, width * height * 3);
+    const pixel_count = try std.math.mul(usize, @as(usize, width), @as(usize, height));
+    const pixel_bytes = try std.math.mul(usize, pixel_count, 3);
+    const pixels = try gpa.alloc(u8, pixel_bytes);
+    defer gpa.free(pixels);
 
     const ctx = context.Context{
         .width = width,
