@@ -1,12 +1,21 @@
 const mandelbrot = @import("mandelbrot.zig");
 
 pub fn compute_row(context: anytype, y: usize) void {
-    for (0..context.width) |x| {
-        const x0 = context.x_min + (@as(f64, @floatFromInt(x)) / @as(f64, @floatFromInt(context.width))) * (context.x_max - context.x_min);
-        const y0 = context.y_min + (@as(f64, @floatFromInt(y)) / @as(f64, @floatFromInt(context.height))) * (context.y_max - context.y_min);
+    const width = context.width;
+    const width_f = @as(f64, @floatFromInt(width));
+    const x_min = context.x_min;
+    const x_scale = (context.x_max - x_min) / width_f;
+
+    const height_f = @as(f64, @floatFromInt(context.height));
+    const y0 = context.y_min + (@as(f64, @floatFromInt(y)) / height_f) * (context.y_max - context.y_min);
+
+    const row_offset = y * width * 3;
+
+    for (0..width) |x| {
+        const x0 = x_min + x_scale * @as(f64, @floatFromInt(x));
         const iteration = mandelbrot.mandelbrot(x0, y0, context.max_iter);
 
-        const offset = (y * context.width + x) * 3;
+        const offset = row_offset + x * 3;
         if (iteration == context.max_iter) {
             context.pixels[offset] = 0x00;
             context.pixels[offset + 1] = 0x00;
