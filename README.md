@@ -11,12 +11,12 @@ zig build --release=safe
 ## Usage
 
 ```bash
-zig-mandelbrot <width> <height>
+zig-mandelbrot <width> <height> <n_jobs>
 ```
 
 Example:
 ```bash
-zig-mandelbrot 800 600
+zig-mandelbrot 800 600 16
 ```
 
 This generates `output.ppm` with the specified dimensions.

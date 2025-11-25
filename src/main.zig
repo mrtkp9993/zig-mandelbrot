@@ -4,16 +4,24 @@ const compute_row = @import("compute_row.zig");
 const context = @import("context.zig");
 
 pub fn main() !void {
-    const gpa = std.heap.page_allocator;
+    var arena = std.heap.ArenaAllocator.init(std.heap.smp_allocator);
+    defer arena.deinit();
+    const allocator = arena.allocator();
 
-    const args = try std.process.argsAlloc(gpa);
-    defer std.process.argsFree(gpa, args);
+    const args = try std.process.argsAlloc(allocator);
+    defer std.process.argsFree(allocator, args);
 
-    if (args.len < 3) return error.NotEnoughArgs;
+    if (args.len < 4) return error.NotEnoughArgs;
 
-    const width = try std.fmt.parseInt(u32, args[1], 10);
-    const height = try std.fmt.parseInt(u32, args[2], 10);
-    const pixels = try gpa.alloc(u8, width * height * 3);
+    const width = try std.fmt.parseInt(u64, args[1], 10);
+    const height = try std.fmt.parseInt(u64, args[2], 10);
+
+    if (width > std.math.maxInt(usize) / height / 3) {
+        return error.ImageTooLarge;
+    }
+
+    const pixels = try allocator.alloc(u8, width * height * 3);
+    const n_jobs = try std.fmt.parseInt(usize, args[3], 10);
 
     const ctx = context.Context{
         .width = width,
@@ -27,7 +35,7 @@ pub fn main() !void {
     };
 
     var thread_pool: std.Thread.Pool = undefined;
-    try thread_pool.init(.{ .allocator = gpa });
+    try thread_pool.init(.{ .allocator = allocator, .n_jobs = n_jobs });
     defer thread_pool.deinit();
 
     var wait_group: std.Thread.WaitGroup = undefined;
