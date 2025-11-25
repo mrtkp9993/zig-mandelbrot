@@ -1,6 +1,9 @@
+const std = @import("std");
+
 const mandelbrot = @import("mandelbrot.zig");
 
-pub fn compute_row(context: anytype, y: usize) void {
+pub fn compute_row(context: anytype, y: usize, wait_group: *std.Thread.WaitGroup) void {
+    defer wait_group.finish();
     for (0..context.width) |x| {
         const x0 = context.x_min + (@as(f64, @floatFromInt(x)) / @as(f64, @floatFromInt(context.width))) * (context.x_max - context.x_min);
         const y0 = context.y_min + (@as(f64, @floatFromInt(y)) / @as(f64, @floatFromInt(context.height))) * (context.y_max - context.y_min);

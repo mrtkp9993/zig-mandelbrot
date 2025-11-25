@@ -36,7 +36,8 @@ pub fn main() !void {
     std.debug.print("Starting to calculate...\n", .{});
     var timer = try std.time.Timer.start();
     for (0..height) |y| {
-        try thread_pool.spawn(compute_row.compute_row, .{ ctx, y });
+        wait_group.start();
+        try thread_pool.spawn(compute_row.compute_row, .{ ctx, y, &wait_group });
     }
     thread_pool.waitAndWork(&wait_group);
 
